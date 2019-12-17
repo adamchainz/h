@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 import pytest
 
 import h
@@ -52,19 +54,32 @@ def test_attribute_empty_string():
 
 
 def test_attribute_true():
-    assert h.tag("input", type="checkbox", checked=True).to_html() == '<input type="checkbox" checked>'
+    assert (
+        h.tag("input", type="checkbox", checked=True).to_html()
+        == '<input type="checkbox" checked>'
+    )
 
 
 def test_attribute_false():
-    assert h.tag("input", type="checkbox", checked=False).to_html() == '<input type="checkbox">'
+    assert (
+        h.tag("input", type="checkbox", checked=False).to_html()
+        == '<input type="checkbox">'
+    )
 
 
 def test_attribute_false_only():
-    assert h.tag("input", disabled=False).to_html() == '<input>'
+    assert h.tag("input", disabled=False).to_html() == "<input>"
 
 
 def test_attribute_style_dict():
     assert h.tag("b", style={"color": "red"}).to_html() == '<b style="color: red"></b>'
+
+
+def test_attribute_style_ordered_dict():
+    assert (
+        h.tag("b", style=OrderedDict([("color", "red")])).to_html()
+        == '<b style="color: red"></b>'
+    )
 
 
 def test_attribute_and_child():

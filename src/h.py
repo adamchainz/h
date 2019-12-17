@@ -1,5 +1,6 @@
 # https://github.com/hyperhype/hyperscript
 # https://www.w3.org/TR/html52/syntax.html#writing-html-documents-elements
+from collections.abc import Mapping
 from html import escape
 from functools import partial
 
@@ -77,7 +78,7 @@ class tag:
                 norm_key = {"class_": "class"}.get(key, key)
                 html += norm_key
 
-                if key == "style" and isinstance(value, dict):
+                if key == "style" and isinstance(value, Mapping):
                     str_value = "; ".join(
                         f"{css_key}: {css_value}"
                         for css_key, css_value in value.items()
