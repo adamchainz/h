@@ -74,9 +74,21 @@ class tag:
                 if value is False:
                     continue
                 html += " "
-                html += key
+                norm_key = {"class_": "class"}.get(key, key)
+                html += norm_key
+
+                if key == "style" and isinstance(value, dict):
+                    str_value = "; ".join(
+                        f"{css_key}: {css_value}"
+                        for css_key, css_value in value.items()
+                    )
+                elif isinstance(value, (tuple, list)):
+                    str_value = ' '.join(value)
+                else:
+                    str_value = str(value)
+
                 if value is not True:
-                    html += '="' + escape(value, quote=True) + '"'
+                    html += '="' + escape(str_value, quote=True) + '"'
         html += ">"
         if not self.is_void:
             html += "".join(child.to_html() for child in self.children)

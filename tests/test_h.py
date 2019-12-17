@@ -39,6 +39,14 @@ def test_attribute():
     assert h.tag("b", id="foo").to_html() == '<b id="foo"></b>'
 
 
+def test_attribute_class_trailing_underscore():
+    assert h.tag("b", class_="foo").to_html() == '<b class="foo"></b>'
+
+
+def test_attribute_list():
+    assert h.tag("b", class_=["foo", "bar"]).to_html() == '<b class="foo bar"></b>'
+
+
 def test_attribute_empty_string():
     assert h.tag("a", href="").to_html() == '<a href=""></a>'
 
@@ -55,12 +63,8 @@ def test_attribute_false_only():
     assert h.tag("input", disabled=False).to_html() == '<input>'
 
 
-def test_class_attribute():
-    assert h.tag("b", class_="foo").to_html() == '<b class="foo"></b>'
-
-
-def test_id_attribute():
-    assert h.tag("b", id_="foo").to_html() == '<b id="foo"></b>'
+def test_attribute_style_dict():
+    assert h.tag("b", style={"color": "red"}).to_html() == '<b style="color: red"></b>'
 
 
 def test_attribute_and_child():
