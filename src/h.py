@@ -40,15 +40,15 @@ void_tags = {
 }
 
 
-class h:
-    __slots__ = ("tag", "is_void", "children", "attrs")
+class tag:
+    __slots__ = ("name", "is_void", "children", "attrs")
 
-    def __init__(self, tag, *children, **attrs):
-        self.tag = tag
-        self.is_void = tag in void_tags
+    def __init__(self, name, *children, **attrs):
+        self.name = name
+        self.is_void = name in void_tags
 
         if self.is_void and children:
-            raise ValueError(f"Tag {tag} may not have children")
+            raise ValueError(f"Tag {self.name} may not have children")
 
         self.children = []
         children += tuple(attrs.pop("children", ()))
@@ -68,7 +68,7 @@ class h:
         }
 
     def to_html(self):
-        html = f"<{self.tag}"
+        html = f"<{self.name}"
         if self.attrs:
             html += " "
             html += " ".join(
@@ -77,17 +77,21 @@ class h:
         html += ">"
         if not self.is_void:
             html += "".join(child.to_html() for child in self.children)
-            html += f"</{self.tag}>"
+            html += f"</{self.name}>"
         return html
 
     # Jinja2 compatibility
     __html__ = to_html
 
 
-html = partial(h, "html")
-head = partial(h, "body")
-h1 = partial(h, "h1")
-h2 = partial(h, "h2")
-p = partial(h, "p")
-b = partial(h, "b")
-i = partial(h, "i")
+b = partial(tag, "b")
+body = partial(tag, "body")
+h1 = partial(tag, "h1")
+h2 = partial(tag, "h2")
+head = partial(tag, "body")
+header = partial(tag, "header")
+html = partial(tag, "html")
+i = partial(tag, "i")
+main = partial(tag, "main")
+p = partial(tag, "p")
+title = partial(tag, "title")
