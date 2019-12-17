@@ -71,7 +71,7 @@ class tag:
         html = f"<{self.name}"
         if self.attrs:
             for key, value in self.attrs.items():
-                if not value:
+                if value is False:
                     continue
                 html += " "
                 html += key
