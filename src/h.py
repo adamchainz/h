@@ -96,9 +96,6 @@ class tag:
             html += f"</{self.name}>"
         return html
 
-    # Jinja2 compatibility
-    __html__ = to_html
-
 
 b = partial(tag, "b")
 body = partial(tag, "body")
