@@ -97,14 +97,125 @@ class tag:
         return html
 
 
-b = partial(tag, "b")
-body = partial(tag, "body")
-h1 = partial(tag, "h1")
-h2 = partial(tag, "h2")
-head = partial(tag, "body")
-header = partial(tag, "header")
-html = partial(tag, "html")
-i = partial(tag, "i")
-main = partial(tag, "main")
-p = partial(tag, "p")
-title = partial(tag, "title")
+_shortcut_tags = {
+    # Pulled from HTML 5 specification
+    "a",
+    "abbr",
+    "address",
+    "area",
+    "article",
+    "aside",
+    "audio",
+    "b",
+    "base",
+    "bdi",
+    "bdo",
+    "blockquote",
+    "body",
+    "br",
+    "button",
+    "canvas",
+    "caption",
+    "cite",
+    "code",
+    "col",
+    "colgroup",
+    "data",
+    "datalist",
+    "dd",
+    "details",
+    "dfn",
+    "dialog",
+    "div",
+    "dl",
+    "dt",
+    "em",
+    "embed",
+    "fieldset",
+    "figcaption",
+    "figure",
+    "footer",
+    "form",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "head",
+    "header",
+    "hr",
+    "html",
+    "i",
+    "iframe",
+    "img",
+    "input",
+    "ins",
+    "kbd",
+    "label",
+    "legend",
+    "li",
+    "link",
+    "main",
+    "map",
+    "mark",
+    "meta",
+    "meter",
+    "nav",
+    "noscript",
+    "object",
+    "ol",
+    "optgroup",
+    "option",
+    "output",
+    "p",
+    "param",
+    "picture",
+    "pre",
+    "progress",
+    "q",
+    "rb",
+    "rp",
+    "rt",
+    "rtc",
+    "ruby",
+    "s",
+    "samp",
+    "script",
+    "section",
+    "select",
+    "small",
+    "source",
+    "span",
+    "strong",
+    "style",
+    "sub",
+    "summary",
+    "sup",
+    "table",
+    "tbody",
+    "td",
+    "template",
+    "textarea",
+    "tfoot",
+    "th",
+    "time",
+    "title",
+    "tr",
+    "track",
+    "u",
+    "ul",
+    "var",
+    "video",
+    "wbr",
+    ("del_", "del"),  # Python keyword
+    ("object_", "object"),  # Python builtin
+}
+
+_globals = globals()
+for _shortcut_tag in _shortcut_tags:
+    if isinstance(_shortcut_tag, tuple):
+        _globals[_shortcut_tag[0]] = partial(tag, _shortcut_tag[1])
+    else:
+        _globals[_shortcut_tag] = partial(tag, _shortcut_tag)
+del _globals

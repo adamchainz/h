@@ -18,6 +18,18 @@ def test_void_tag_cant_have_children():
         h.tag("hr", "Hi")
 
 
+def test_shortcut_tag():
+    assert h.hr().to_html() == "<hr>"
+
+
+def test_shortcut_tag_del():
+    assert h.del_().to_html() == "<del></del>"
+
+
+def test_shortcut_tag_object():
+    assert h.object_().to_html() == "<object></object>"
+
+
 def test_tag_with_text_child():
     assert h.tag("b", "Hi").to_html() == "<b>Hi</b>"
 
@@ -99,7 +111,7 @@ def test_children_list():
 
 
 def test_nested():
-    assert h.tag("b", h.i("Hi")).to_html() == "<b><i>Hi</i></b>"
+    assert h.b(h.i("Hi")).to_html() == "<b><i>Hi</i></b>"
 
 
 def test_doctype():
