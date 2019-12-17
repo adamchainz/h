@@ -70,10 +70,13 @@ class tag:
     def to_html(self):
         html = f"<{self.name}"
         if self.attrs:
-            html += " "
-            html += " ".join(
-                f'{k}="{escape(v, quote=True)}"' for k, v in self.attrs.items()
-            )
+            for key, value in self.attrs.items():
+                if not value:
+                    continue
+                html += " "
+                html += key
+                if value is not True:
+                    html += '="' + escape(value, quote=True) + '"'
         html += ">"
         if not self.is_void:
             html += "".join(child.to_html() for child in self.children)

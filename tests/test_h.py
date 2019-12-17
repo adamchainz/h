@@ -39,6 +39,18 @@ def test_attribute():
     assert h.tag("b", id="foo").to_html() == '<b id="foo"></b>'
 
 
+def test_attribute_true():
+    assert h.tag("input", type="checkbox", checked=True).to_html() == '<input type="checkbox" checked>'
+
+
+def test_attribute_false():
+    assert h.tag("input", type="checkbox", checked=False).to_html() == '<input type="checkbox">'
+
+
+def test_attribute_false_only():
+    assert h.tag("input", disabled=False).to_html() == '<input>'
+
+
 def test_class_attribute():
     assert h.tag("b", class_="foo").to_html() == '<b class="foo"></b>'
 
