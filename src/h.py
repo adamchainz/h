@@ -42,14 +42,14 @@ void_tags = {
 
 
 class tag:
-    __slots__ = ("name", "is_void", "children", "attrs")
+    __slots__ = ("_tag", "is_void", "children", "attrs")
 
-    def __init__(self, name, *children, **attrs):
-        self.name = name
-        self.is_void = name in void_tags
+    def __init__(self, _tag, *children, **attrs):
+        self._tag = _tag
+        self.is_void = _tag in void_tags
 
         if self.is_void and children:
-            raise ValueError(f"Tag {self.name} may not have children")
+            raise ValueError(f"Tag {self._tag} may not have children")
 
         self.children = []
         children += tuple(attrs.pop("children", ()))
@@ -69,7 +69,7 @@ class tag:
         }
 
     def to_html(self):
-        html = f"<{self.name}"
+        html = f"<{self._tag}"
         if self.attrs:
             for key, value in self.attrs.items():
                 if value is False:
@@ -93,7 +93,7 @@ class tag:
         html += ">"
         if not self.is_void:
             html += "".join(child.to_html() for child in self.children)
-            html += f"</{self.name}>"
+            html += f"</{self._tag}>"
         return html
 
 
