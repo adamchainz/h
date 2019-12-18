@@ -97,125 +97,118 @@ class tag:
         return html
 
 
-_shortcut_tags = {
-    # Pulled from HTML 5 specification
-    "a",
-    "abbr",
-    "address",
-    "area",
-    "article",
-    "aside",
-    "audio",
-    "b",
-    "base",
-    "bdi",
-    "bdo",
-    "blockquote",
-    "body",
-    "br",
-    "button",
-    "canvas",
-    "caption",
-    "cite",
-    "code",
-    "col",
-    "colgroup",
-    "data",
-    "datalist",
-    "dd",
-    "details",
-    "dfn",
-    "dialog",
-    "div",
-    "dl",
-    "dt",
-    "em",
-    "embed",
-    "fieldset",
-    "figcaption",
-    "figure",
-    "footer",
-    "form",
-    "h1",
-    "h2",
-    "h3",
-    "h4",
-    "h5",
-    "h6",
-    "head",
-    "header",
-    "hr",
-    "html",
-    "i",
-    "iframe",
-    "img",
-    "input",
-    "ins",
-    "kbd",
-    "label",
-    "legend",
-    "li",
-    "link",
-    "main",
-    "map",
-    "mark",
-    "meta",
-    "meter",
-    "nav",
-    "noscript",
-    "object",
-    "ol",
-    "optgroup",
-    "option",
-    "output",
-    "p",
-    "param",
-    "picture",
-    "pre",
-    "progress",
-    "q",
-    "rb",
-    "rp",
-    "rt",
-    "rtc",
-    "ruby",
-    "s",
-    "samp",
-    "script",
-    "section",
-    "select",
-    "small",
-    "source",
-    "span",
-    "strong",
-    "style",
-    "sub",
-    "summary",
-    "sup",
-    "table",
-    "tbody",
-    "td",
-    "template",
-    "textarea",
-    "tfoot",
-    "th",
-    "time",
-    "title",
-    "tr",
-    "track",
-    "u",
-    "ul",
-    "var",
-    "video",
-    "wbr",
-    ("del_", "del"),  # Python keyword
-    ("object_", "object"),  # Python builtin
-}
+a = partial(tag, "a")
+abbr = partial(tag, "abbr")
+address = partial(tag, "address")
+area = partial(tag, "area")
+article = partial(tag, "article")
+aside = partial(tag, "aside")
+audio = partial(tag, "audio")
+b = partial(tag, "b")
+base = partial(tag, "base")
+bdi = partial(tag, "bdi")
+bdo = partial(tag, "bdo")
+blockquote = partial(tag, "blockquote")
+body = partial(tag, "body")
+br = partial(tag, "br")
+button = partial(tag, "button")
+canvas = partial(tag, "canvas")
+caption = partial(tag, "caption")
+cite = partial(tag, "cite")
+code = partial(tag, "code")
+col = partial(tag, "col")
+colgroup = partial(tag, "colgroup")
+data = partial(tag, "data")
+datalist = partial(tag, "datalist")
+dd = partial(tag, "dd")
+del_ = partial(tag, "del")  # Python keyword
+details = partial(tag, "details")
+dfn = partial(tag, "dfn")
+dialog = partial(tag, "dialog")
+div = partial(tag, "div")
+dl = partial(tag, "dl")
+dt = partial(tag, "dt")
+em = partial(tag, "em")
+embed = partial(tag, "embed")
+fieldset = partial(tag, "fieldset")
+figcaption = partial(tag, "figcaption")
+figure = partial(tag, "figure")
+footer = partial(tag, "footer")
+form = partial(tag, "form")
+h1 = partial(tag, "h1")
+h2 = partial(tag, "h2")
+h3 = partial(tag, "h3")
+h4 = partial(tag, "h4")
+h5 = partial(tag, "h5")
+h6 = partial(tag, "h6")
+head = partial(tag, "head")
+header = partial(tag, "header")
+hr = partial(tag, "hr")
+html = partial(tag, "html")
+i = partial(tag, "i")
+iframe = partial(tag, "iframe")
+img = partial(tag, "img")
+input_ = partial(tag, "input")  # Python builtin
+ins = partial(tag, "ins")
+kbd = partial(tag, "kbd")
+label = partial(tag, "label")
+legend = partial(tag, "legend")
+li = partial(tag, "li")
+link = partial(tag, "link")
+main = partial(tag, "main")
+map_ = partial(tag, "map")  # Python builtin
+mark = partial(tag, "mark")
+meta = partial(tag, "meta")
+meter = partial(tag, "meter")
+nav = partial(tag, "nav")
+noscript = partial(tag, "noscript")
+object_ = partial(tag, "object")  # Python builtin
+ol = partial(tag, "ol")
+optgroup = partial(tag, "optgroup")
+option = partial(tag, "option")
+output = partial(tag, "output")
+p = partial(tag, "p")
+param = partial(tag, "param")
+picture = partial(tag, "picture")
+pre = partial(tag, "pre")
+progress = partial(tag, "progress")
+q = partial(tag, "q")
+rb = partial(tag, "rb")
+rp = partial(tag, "rp")
+rt = partial(tag, "rt")
+rtc = partial(tag, "rtc")
+ruby = partial(tag, "ruby")
+s = partial(tag, "s")
+samp = partial(tag, "samp")
+script = partial(tag, "script")
+section = partial(tag, "section")
+select = partial(tag, "select")
+small = partial(tag, "small")
+source = partial(tag, "source")
+span = partial(tag, "span")
+strong = partial(tag, "strong")
+style = partial(tag, "style")
+sub = partial(tag, "sub")
+summary = partial(tag, "summary")
+sup = partial(tag, "sup")
+table = partial(tag, "table")
+tbody = partial(tag, "tbody")
+td = partial(tag, "td")
+template = partial(tag, "template")
+textarea = partial(tag, "textarea")
+tfoot = partial(tag, "tfoot")
+th = partial(tag, "th")
+thead = partial(tag, "thead")
+time = partial(tag, "time")
+title = partial(tag, "title")
+tr = partial(tag, "tr")
+track = partial(tag, "track")
+u = partial(tag, "u")
+ul = partial(tag, "ul")
+var = partial(tag, "var")
+video = partial(tag, "video")
+wbr = partial(tag, "wbr")
 
-_globals = globals()
-for _shortcut_tag in _shortcut_tags:
-    if isinstance(_shortcut_tag, tuple):
-        _globals[_shortcut_tag[0]] = partial(tag, _shortcut_tag[1])
-    else:
-        _globals[_shortcut_tag] = partial(tag, _shortcut_tag)
-del _globals
+
+def html_page(*args, **kwargs):
+    return doctype(html(*args, **kwargs))
