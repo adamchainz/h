@@ -4,7 +4,6 @@ pip install django
 DEBUG=1 python django_app.py runserver
 """
 import os
-import random
 import sys
 
 from django.conf import settings
@@ -25,9 +24,9 @@ def bootstrap_jumbotron(*args, class_=None, **kwargs):
     return h.div(*args, class_=class_, **kwargs)
 
 
-def my_template(name, main_contents):
+def my_template(*, name, main_contents):
     return h.html_page(
-        head_contents=[
+        h.head(
             h.title(name),
             h.meta(charset="utf-8"),
             h.meta(
@@ -40,10 +39,8 @@ def my_template(name, main_contents):
                 integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh",
                 crossorigin="anonymous",
             ),
-        ],
-        body_contents=[
-            bootstrap_jumbotron(h.header(h.h1(name)), h.main(*main_contents),),
-        ],
+        ),
+        h.body(bootstrap_jumbotron(h.header(h.h1(name)), h.main(*main_contents))),
     )
 
 
@@ -63,15 +60,30 @@ settings.configure(
 
 
 def index(request):
-    name = request.GET.get("name", "World")
+    system_data = {
+        "Copyright": sys.copyright,
+        "Executable": sys.executable,
+        "Implementation Name": sys.implementation.name,
+        "Platform": sys.platform,
+        "Version": sys.version,
+        "Prefix": sys.prefix,
+        "C API Version": sys.api_version,
+    }
     return HResponse(
         my_template(
-            name=f"Hello {name}!",
+            name=f"Python information",
             main_contents=[
-                h.p(style="color: red", children=["Hello ", name, "!"]),
-                h.img(
-                    src=f"https://placekitten.com/{random.randint(200, 500)}/400",
-                    class_=["img-thumbnail", "rounded", "mx-auto", "d-block"],
+                h.table(
+                    class_=["table", "table-hover", "table-striped", "table-bordered"],
+                    children=[
+                        h.thead(h.tr(h.th("Key"), h.th("Value"))),
+                        h.tbody(
+                            children=[
+                                h.tr(h.td(key), h.td(h.pre(value)))
+                                for key, value in system_data.items()
+                            ]
+                        ),
+                    ],
                 ),
             ],
         )
