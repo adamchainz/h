@@ -24,29 +24,58 @@ def bootstrap_jumbotron(*args, class_=None, **kwargs):
     return h.div(*args, class_=class_, **kwargs)
 
 
-def my_template(*, name, main_contents):
-    return h.html_page(
-        h.head(
-            h.title(name),
-            h.meta(charset="utf-8"),
-            h.meta(
-                name="viewport",
-                content="width=device-width, initial-scale=1, shrink-to-fit=no",
-            ),
-            h.link(
-                rel="stylesheet",
-                href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css",
-                integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh",
-                crossorigin="anonymous",
-            ),
-        ),
-        h.body(bootstrap_jumbotron(h.header(h.h1(name)), h.main(*main_contents))),
+def bootstrap_table(hover=True, striped=True, bordered=True):
+    class_ = ["table"]
+    if hover:
+        class_.append("table-hover")
+    if striped:
+        class_.append("table-striped")
+    if bordered:
+        class_.append("table-bordered")
+    return h.table(class_=class_)
+
+
+def template_base(*, name, main_contents):
+    return h.doctype()[
+        h.html(lang="en")[
+            h.head()[
+                h.comment("Required meta tags"),
+                h.meta(charset="utf-8"),
+                h.meta(
+                    name="viewport",
+                    content="width=device-width, initial-scale=1, shrink-to-fit=no",
+                ),
+                h.comment("Bootstrap CSS"),
+                h.link(
+                    rel="stylesheet",
+                    href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css",
+                    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh",
+                    crossorigin="anonymous",
+                ),
+                h.title(name),
+            ],
+            h.body()[
+                bootstrap_jumbotron()[h.header(h.h1(name)), h.main()[main_contents]]
+            ],
+        ]
+    ]
+
+
+def template_table_page(*, title: str, table: dict):
+    return template_base(
+        name=title,
+        main_contents=[
+            bootstrap_table()[
+                h.thead(h.tr(h.th("Key"), h.th("Value"))),
+                h.tbody(
+                    children=[
+                        h.tr(h.td(key), h.td(h.pre(value)))
+                        for key, value in table.items()
+                    ]
+                ),
+            ],
+        ],
     )
-
-
-class HResponse(HttpResponse):
-    def __init__(self, content, *args, **kwargs):
-        super().__init__(content.to_html(), *args, **kwargs)
 
 
 settings.configure(
@@ -60,38 +89,36 @@ settings.configure(
 
 
 def index(request):
+    def link_with_url(urlname):
+        return h.a(href=urlname)[urlname]
+
+    links = {
+        "Python Information": link_with_url("/pyinfo/"),
+    }
+    return HttpResponse(template_table_page(title="🏡 Home", table=links).to_html())
+
+
+def pyinfo(request):
     system_data = {
+        "Byte Order": sys.byteorder,
+        "C API Version": sys.api_version,
         "Copyright": sys.copyright,
         "Executable": sys.executable,
         "Implementation Name": sys.implementation.name,
         "Platform": sys.platform,
-        "Version": sys.version,
         "Prefix": sys.prefix,
-        "C API Version": sys.api_version,
+        "Recursion Limit": f"{sys.getrecursionlimit()} frames",
+        "Thread Switch Interval": f"{sys.getswitchinterval()} seconds",
+        "Version": sys.version,
     }
-    return HResponse(
-        my_template(
-            name=f"Python information",
-            main_contents=[
-                h.table(
-                    class_=["table", "table-hover", "table-striped", "table-bordered"],
-                    children=[
-                        h.thead(h.tr(h.th("Key"), h.th("Value"))),
-                        h.tbody(
-                            children=[
-                                h.tr(h.td(key), h.td(h.pre(value)))
-                                for key, value in system_data.items()
-                            ]
-                        ),
-                    ],
-                ),
-            ],
-        )
+    return HttpResponse(
+        template_table_page(title="🔍 Python Information", table=system_data).to_html()
     )
 
 
 urlpatterns = [
     path("", index),
+    path("pyinfo/", pyinfo),
 ]
 
 app = get_wsgi_application()

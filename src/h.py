@@ -1,16 +1,8 @@
 # https://github.com/hyperhype/hyperscript
 # https://www.w3.org/TR/html52/syntax.html#writing-html-documents-elements
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from html import escape
 from functools import partial
-
-
-class doctype:
-    def __init__(self, *children):
-        self.children = children
-
-    def to_html(self):
-        return "<!DOCTYPE html>" + "".join(child.to_html() for child in self.children)
 
 
 class text:
@@ -21,6 +13,26 @@ class text:
 
     def to_html(self):
         return escape(str(self._item))
+
+
+class unsafe_raw_text:
+    __slots__ = ("_item",)
+
+    def __init__(self, item):
+        self._item = item
+
+    def to_html(self):
+        return str(self._item)
+
+
+class comment:
+    __slots__ = ("_contents",)
+
+    def __init__(self, contents):
+        self._contents = contents
+
+    def to_html(self):
+        return f"<!--{escape(str(self._contents))}-->"
 
 
 void_tags = {
@@ -68,6 +80,27 @@ class tag:
             key_replacements.get(key, key): value for key, value in attrs.items()
         }
 
+    def __getitem__(self, key):
+        if self.is_void:
+            raise ValueError(f"Tag {self._tag} may not have children")
+        if isinstance(key, Iterable) and not isinstance(key, str):
+            children = key
+        else:
+            children = [key]
+
+        self.children = []
+        for child in children:
+            if hasattr(child, "to_html"):
+                self.children.append(child)
+            elif child is None:
+                # Allow None to make inline ifs easy
+                pass
+            else:
+                # Anything else we'll try to render as text
+                self.children.append(text(child))
+
+        return self
+
     def to_html(self):
         html = f"<{self._tag}"
         if self.attrs:
@@ -94,6 +127,17 @@ class tag:
         if not self.is_void:
             html += "".join(child.to_html() for child in self.children)
             html += f"</{self._tag}>"
+        return html
+
+
+class doctype(tag):
+    def __init__(self):
+        super().__init__('doctype')
+
+    def to_html(self):
+        html = "<!DOCTYPE html>"
+        for child in self.children:
+            html += child.to_html()
         return html
 
 
@@ -208,7 +252,3 @@ ul = partial(tag, "ul")
 var = partial(tag, "var")
 video = partial(tag, "video")
 wbr = partial(tag, "wbr")
-
-
-def html_page(*args, **kwargs):
-    return doctype(html(*args, **kwargs))
