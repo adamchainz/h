@@ -41,6 +41,10 @@ def test_shortcut_tag_input():
     assert str(h.input_()) == "<input>"
 
 
+def test_shortcut_tag_map():
+    assert str(h.map_()) == "<map></map>"
+
+
 def test_shortcut_tag_object():
     assert str(h.object_()) == "<object></object>"
 
@@ -62,6 +66,10 @@ def test_multiple_children():
 
 def test_tag_child_None_ignored():
     assert str(h.b()[None]) == "<b></b>"
+
+
+def test_tag_class_child_direct():
+    assert str(h.b["Hi"]) == "<b>Hi</b>"
 
 
 def test_attribute():

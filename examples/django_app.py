@@ -14,8 +14,6 @@ from django.utils.crypto import get_random_string
 
 import h
 
-# h helpers
-
 
 def bootstrap_jumbotron(*, class_=None, **kwargs):
     if class_ is None:
@@ -36,9 +34,9 @@ def bootstrap_table(hover=True, striped=True, bordered=True):
 
 
 def template_base(*, name, main_contents):
-    return h.doctype()[
+    return h.doctype[
         h.html(lang="en")[
-            h.head()[
+            h.head[
                 h.comment("Required meta tags"),
                 h.meta(charset="utf-8"),
                 h.meta(
@@ -52,11 +50,9 @@ def template_base(*, name, main_contents):
                     integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh",
                     crossorigin="anonymous",
                 ),
-                h.title()[name],
+                h.title[name],
             ],
-            h.body()[
-                bootstrap_jumbotron()[h.header()[h.h1()[name], h.main()[main_contents]]]
-            ],
+            h.body[bootstrap_jumbotron()[h.header[h.h1[name], h.main[main_contents]]]],
         ]
     ]
 
@@ -66,10 +62,10 @@ def template_table_page(*, title: str, table: dict):
         name=title,
         main_contents=[
             bootstrap_table()[
-                h.thead()[h.tr()[h.th()["Key"], h.th()["Value"]]],
-                h.tbody()[
+                h.thead[h.tr[h.th["Key"], h.th["Value"]]],
+                h.tbody[
                     (
-                        h.tr()[h.td()[key], h.td()[h.pre()[value]]]
+                        h.tr[h.td[key], h.td[h.pre[value]]]
                         for key, value in table.items()
                     )
                 ],
