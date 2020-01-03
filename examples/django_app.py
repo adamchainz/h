@@ -17,11 +17,11 @@ import h
 # h helpers
 
 
-def bootstrap_jumbotron(*args, class_=None, **kwargs):
+def bootstrap_jumbotron(*, class_=None, **kwargs):
     if class_ is None:
         class_ = []
     class_.append("jumbotron")
-    return h.div(*args, class_=class_, **kwargs)
+    return h.div(class_=class_, **kwargs)
 
 
 def bootstrap_table(hover=True, striped=True, bordered=True):
@@ -52,10 +52,10 @@ def template_base(*, name, main_contents):
                     integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh",
                     crossorigin="anonymous",
                 ),
-                h.title(name),
+                h.title()[name],
             ],
             h.body()[
-                bootstrap_jumbotron()[h.header(h.h1(name)), h.main()[main_contents]]
+                bootstrap_jumbotron()[h.header()[h.h1()[name], h.main()[main_contents]]]
             ],
         ]
     ]
@@ -66,13 +66,13 @@ def template_table_page(*, title: str, table: dict):
         name=title,
         main_contents=[
             bootstrap_table()[
-                h.thead(h.tr(h.th("Key"), h.th("Value"))),
-                h.tbody(
-                    children=[
-                        h.tr(h.td(key), h.td(h.pre(value)))
+                h.thead()[h.tr()[h.th()["Key"], h.th()["Value"]]],
+                h.tbody()[
+                    (
+                        h.tr()[h.td()[key], h.td()[h.pre()[value]]]
                         for key, value in table.items()
-                    ]
-                ),
+                    )
+                ],
             ],
         ],
     )
@@ -95,7 +95,7 @@ def index(request):
     links = {
         "Python Information": link_with_url("/pyinfo/"),
     }
-    return HttpResponse(template_table_page(title="🏡 Home", table=links).to_html())
+    return HttpResponse(template_table_page(title="🏡 Home", table=links))
 
 
 def pyinfo(request):
@@ -112,7 +112,7 @@ def pyinfo(request):
         "Version": sys.version,
     }
     return HttpResponse(
-        template_table_page(title="🔍 Python Information", table=system_data).to_html()
+        template_table_page(title="🔍 Python Information", table=system_data)
     )
 
 

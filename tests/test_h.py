@@ -6,117 +6,146 @@ import h
 
 
 def test_empty_tag():
-    assert h.tag("b").to_html() == "<b></b>"
+    assert str(h.tag("b")) == "<b></b>"
 
 
 def test_void_tag():
-    assert h.tag("hr").to_html() == "<hr>"
+    assert str(h.tag("hr")) == "<hr>"
+
+
+def test_tag_with_children_cant_have_reassigned():
+    with pytest.raises(ValueError) as excinfo:
+        h.tag("b")["Hi"]["Hi again"]
+    assert "Cannot reassign children" in str(excinfo.value)
 
 
 def test_void_tag_cant_have_children():
-    with pytest.raises(ValueError):
-        h.tag("hr", "Hi")
+    with pytest.raises(ValueError) as excinfo:
+        h.tag("hr")["Hi"]
+    assert "Void tag <hr> cannot have children" in str(excinfo.value)
 
 
 def test_shortcut_tag():
-    assert h.hr().to_html() == "<hr>"
+    assert str(h.b()) == "<b></b>"
+
+
+def test_shortcut_void_tag():
+    assert str(h.hr()) == "<hr>"
 
 
 def test_shortcut_tag_del():
-    assert h.del_().to_html() == "<del></del>"
+    assert str(h.del_()) == "<del></del>"
+
+
+def test_shortcut_tag_input():
+    assert str(h.input_()) == "<input>"
 
 
 def test_shortcut_tag_object():
-    assert h.object_().to_html() == "<object></object>"
+    assert str(h.object_()) == "<object></object>"
 
 
 def test_tag_with_text_child():
-    assert h.tag("b", "Hi").to_html() == "<b>Hi</b>"
+    assert str(h.tag("b")["Hi"]) == "<b>Hi</b>"
 
 
 def test_tag_with_integer_child():
-    assert h.tag("b", 1).to_html() == "<b>1</b>"
+    assert str(h.tag("b")[1]) == "<b>1</b>"
 
 
 def test_multiple_children():
     assert (
-        h.tag("ul", h.tag("li", "Item 1"), h.tag("li", "Item 2")).to_html()
+        str(h.ul()[h.li()["Item 1"], h.li()["Item 2"]])
         == "<ul><li>Item 1</li><li>Item 2</li></ul>"
     )
 
 
 def test_tag_child_None_ignored():
-    assert h.tag("b", None).to_html() == "<b></b>"
+    assert str(h.b()[None]) == "<b></b>"
 
 
 def test_attribute():
-    assert h.tag("b", id="foo").to_html() == '<b id="foo"></b>'
+    assert str(h.a(href="https://example.com")) == '<a href="https://example.com"></a>'
 
 
-def test_attribute_class_trailing_underscore():
-    assert h.tag("b", class_="foo").to_html() == '<b class="foo"></b>'
+def test_attribute_id():
+    assert str(h.h1(id="myheading")) == '<h1 id="myheading"></h1>'
+
+
+def test_attribute_class():
+    assert str(h.b(class_="mybold")) == '<b class="mybold"></b>'
 
 
 def test_attribute_list():
-    assert h.tag("b", class_=["foo", "bar"]).to_html() == '<b class="foo bar"></b>'
+    assert str(h.b(class_=["foo", "bar"])) == '<b class="foo bar"></b>'
 
 
 def test_attribute_empty_string():
-    assert h.tag("a", href="").to_html() == '<a href=""></a>'
+    assert str(h.a(href="")) == '<a href=""></a>'
 
 
-def test_attribute_true():
+def test_attribute_bool_true():
     assert (
-        h.tag("input", type="checkbox", checked=True).to_html()
+        str(h.input_(type="checkbox", checked=True))
         == '<input type="checkbox" checked>'
     )
 
 
-def test_attribute_false():
-    assert (
-        h.tag("input", type="checkbox", checked=False).to_html()
-        == '<input type="checkbox">'
-    )
+def test_attribute_bool_false():
+    assert str(h.input_(type="checkbox", checked=False)) == '<input type="checkbox">'
 
 
-def test_attribute_false_only():
-    assert h.tag("input", disabled=False).to_html() == "<input>"
+def test_attribute_bool_false_solo():
+    assert str(h.input_(disabled=False)) == "<input>"
 
 
 def test_attribute_style_dict():
-    assert h.tag("b", style={"color": "red"}).to_html() == '<b style="color: red"></b>'
+    assert str(h.b(style={"color": "red"})) == '<b style="color: red"></b>'
 
 
 def test_attribute_style_ordered_dict():
     assert (
-        h.tag("b", style=OrderedDict([("color", "red")])).to_html()
-        == '<b style="color: red"></b>'
+        str(h.b(style=OrderedDict([("color", "red"), ("font-weight", "bold")])))
+        == '<b style="color: red; font-weight: bold"></b>'
     )
 
 
 def test_attribute_and_child():
-    assert h.tag("b", "Hi", id="foo").to_html() == '<b id="foo">Hi</b>'
+    assert str(h.b(id="foo")["Hi"]) == '<b id="foo">Hi</b>'
 
 
 def test_void_tag_attribute():
-    assert h.tag("hr", id="foo").to_html() == '<hr id="foo">'
-
-
-def test_children_tuple():
-    assert h.tag("b", id="foo", children=("Hi",)).to_html() == '<b id="foo">Hi</b>'
-
-
-def test_children_list():
-    assert h.tag("b", id="foo", children=["Hi"]).to_html() == '<b id="foo">Hi</b>'
+    assert str(h.hr(id="foo")) == '<hr id="foo">'
 
 
 def test_nested():
-    assert h.b(h.i("Hi")).to_html() == "<b><i>Hi</i></b>"
+    assert str(h.b()[h.i()["Hi"]]) == "<b><i>Hi</i></b>"
 
 
 def test_doctype():
-    assert h.doctype().to_html() == "<!DOCTYPE html>"
+    assert str(h.doctype()) == "<!DOCTYPE html>"
 
 
 def test_doctype_child():
-    assert h.doctype(h.html()).to_html() == "<!DOCTYPE html><html></html>"
+    assert str(h.doctype()[h.html()]) == "<!DOCTYPE html><html></html>"
+
+
+def test_text():
+    assert (
+        str(h.text("<script>alert(1)</script>"))
+        == "&lt;script&gt;alert(1)&lt;/script&gt;"
+    )
+
+
+def test_unsafe_raw_text():
+    assert (
+        str(h.unsafe_raw_text("<script>alert(1)</script>"))
+        == "<script>alert(1)</script>"
+    )
+
+
+def test_comment():
+    assert (
+        str(h.comment("<script>alert(1)</script>"))
+        == "<!--&lt;script&gt;alert(1)&lt;/script&gt;-->"
+    )

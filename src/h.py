@@ -1,37 +1,41 @@
 # https://github.com/hyperhype/hyperscript
 # https://www.w3.org/TR/html52/syntax.html#writing-html-documents-elements
-from collections.abc import Iterable, Mapping
+from collections.abc import Generator, Iterable, Mapping
 from html import escape
 from functools import partial
 
 
-class text:
+class html_item:
+    pass
+
+
+class text(html_item):
     __slots__ = ("_item",)
 
     def __init__(self, item):
         self._item = item
 
-    def to_html(self):
+    def __str__(self):
         return escape(str(self._item))
 
 
-class unsafe_raw_text:
+class unsafe_raw_text(html_item):
     __slots__ = ("_item",)
 
     def __init__(self, item):
         self._item = item
 
-    def to_html(self):
+    def __str__(self):
         return str(self._item)
 
 
-class comment:
+class comment(html_item):
     __slots__ = ("_contents",)
 
     def __init__(self, contents):
         self._contents = contents
 
-    def to_html(self):
+    def __str__(self):
         return f"<!--{escape(str(self._contents))}-->"
 
 
@@ -53,44 +57,32 @@ void_tags = {
 }
 
 
-class tag:
+class tag(html_item):
     __slots__ = ("_tag", "is_void", "children", "attrs")
 
-    def __init__(self, _tag, *children, **attrs):
+    def __init__(self, _tag, **attrs):
         self._tag = _tag
         self.is_void = _tag in void_tags
-
-        if self.is_void and children:
-            raise ValueError(f"Tag {self._tag} may not have children")
-
-        self.children = []
-        children += tuple(attrs.pop("children", ()))
-        for child in children:
-            if hasattr(child, "to_html"):
-                self.children.append(child)
-            elif child is None:
-                # Allow None to make inline ifs easy
-                pass
-            else:
-                # Anything else we'll try to render as text
-                self.children.append(text(child))
-
-        key_replacements = {"class_": "class", "id_": "id"}
+        attr_aliases = {"class_": "class", "id_": "id"}
         self.attrs = {
-            key_replacements.get(key, key): value for key, value in attrs.items()
+            attr_aliases.get(key, key): value for key, value in attrs.items()
         }
+        self.children = ()
 
     def __getitem__(self, key):
-        if self.is_void:
-            raise ValueError(f"Tag {self._tag} may not have children")
-        if isinstance(key, Iterable) and not isinstance(key, str):
+        if self.children:
+            raise ValueError("Cannot reassign children")
+        elif self.is_void:
+            raise ValueError(f"Void tag <{self._tag}> cannot have children")
+
+        if isinstance(key, (Generator, Iterable)) and not isinstance(key, str):
             children = key
         else:
             children = [key]
 
         self.children = []
         for child in children:
-            if hasattr(child, "to_html"):
+            if isinstance(child, html_item):
                 self.children.append(child)
             elif child is None:
                 # Allow None to make inline ifs easy
@@ -101,7 +93,11 @@ class tag:
 
         return self
 
-    def to_html(self):
+    @classmethod
+    def __class_getitem__(cls, key):
+        return cls()[key]
+
+    def __str__(self):
         html = f"<{self._tag}"
         if self.attrs:
             for key, value in self.attrs.items():
@@ -125,7 +121,8 @@ class tag:
                     html += '="' + escape(str_value, quote=True) + '"'
         html += ">"
         if not self.is_void:
-            html += "".join(child.to_html() for child in self.children)
+            for child in self.children:
+                html += str(child)
             html += f"</{self._tag}>"
         return html
 
@@ -134,10 +131,10 @@ class doctype(tag):
     def __init__(self):
         super().__init__('doctype')
 
-    def to_html(self):
+    def __str__(self):
         html = "<!DOCTYPE html>"
         for child in self.children:
-            html += child.to_html()
+            html += str(child)
         return html
 
 
