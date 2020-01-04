@@ -3,9 +3,11 @@ pip install -e ..
 pip install django
 DEBUG=1 python django_app.py runserver
 """
+import datetime as dt
 import os
 import sys
 
+import django
 from django.conf import settings
 from django.core.wsgi import get_wsgi_application
 from django.http import HttpResponse
@@ -52,7 +54,20 @@ def template_base(*, name, main_contents):
                 ),
                 h.title[name],
             ],
-            h.body[bootstrap_jumbotron()[h.header[h.h1[name], h.main[main_contents]]]],
+            h.body[
+                bootstrap_jumbotron()[
+                    h.header[h.h1[name]],
+                    h.main[main_contents],
+                    h.footer[
+                        h.p[
+                            h.small[
+                                f"🦄 Page generated with Django {django.get_version()} @"
+                                f" {str(dt.datetime.utcnow())[:-3]}"
+                            ]
+                        ]
+                    ],
+                ],
+            ],
         ]
     ]
 
@@ -89,12 +104,26 @@ def index(request):
         return h.a(href=urlname)[urlname]
 
     links = {
-        "Python Information": link_with_url("/pyinfo/"),
+        "Django Information": link_with_url("/django-info/"),
+        "Python Information": link_with_url("/python-info/"),
     }
     return HttpResponse(template_table_page(title="🏡 Home", table=links))
 
 
-def pyinfo(request):
+def django_info(request):
+    django_data = {
+        "Version": django.get_version(),
+        "Docs Link": h.a(
+            href=f"https://docs.djangoproject.com/en/{django.VERSION[0]}.{django.VERSION[1]}/"
+        )[f"Django {django.VERSION[0]}.{django.VERSION[1]} docs"],
+        "Contributors": "Many!",
+    }
+    return HttpResponse(
+        template_table_page(title="🦄 Django Information", table=django_data)
+    )
+
+
+def python_info(request):
     system_data = {
         "Byte Order": sys.byteorder,
         "C API Version": sys.api_version,
@@ -114,7 +143,8 @@ def pyinfo(request):
 
 urlpatterns = [
     path("", index),
-    path("pyinfo/", pyinfo),
+    path("django-info/", django_info),
+    path("python-info/", python_info),
 ]
 
 app = get_wsgi_application()
